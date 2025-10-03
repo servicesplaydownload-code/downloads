@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload de APK</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #000000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 10px;
+    }
+    .container {
+      background: rgb(125, 123, 123);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 350px;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+      max-width: 50%;
+      height: auto;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 1.5em;
+    }
+    input[type="file"] {
+      display: block;
+      margin: 15px auto;
+      width: 100%;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+    .copy-link {
+      background: #007bff;
+    }
+    .copy-link:hover {
+      background: #0056b3;
+    }
+    #message {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #333;
+    }
+    @media (max-width: 400px) {
+      .container {
+        padding: 20px;
+        width: 95%;       /* ocupa quase toda a tela */
+        max-width: 95%;   /* limite acompanha */
+      }
+      h2 {
+        font-size: 1.2em;
+      }
+      button {
+        font-size: 14px;
+        padding: 8px 15px;
+      }
+      .logo {
+        max-width: 60%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="assets/logo1.png" alt="Logo" class="logo">
+    <h2>Enviar APK</h2>
+
+    <input type="file" id="fileInput" accept=".apk">
+    <button id="uploadBtn">Enviar</button>
+    <br>
+    <button class="copy-link" id="copyBtn" disabled>📋 Copiar Link</button>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
+    const copyBtn = document.getElementById('copyBtn');
+    const message = document.getElementById('message');
+    let fileLink = ""; // Guarda o link do arquivo
+
+    uploadBtn.addEventListener('click', () => {
+      if (!fileInput.files[0]) {
+        alert('Selecione um arquivo primeiro!');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      message.textContent = "⏳ Enviando arquivo...";
+      uploadBtn.disabled = true;
+
+      fetch('upload.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        fileLink = data.trim(); // salva o link do arquivo
+        copyBtn.disabled = false;
+        message.textContent = "✅ Upload concluído! Clique no botão para copiar o link.";
+      })
+      .catch(err => {
+        console.error(err);
+        message.textContent = "❌ Erro ao enviar o arquivo.";
+      })
+      .finally(() => {
+        uploadBtn.disabled = false;
+      });
+    });
+
+    copyBtn.addEventListener('click', () => {
+      if (!fileLink) return;
+      navigator.clipboard.writeText(fileLink)
+        .then(() => {
+          message.textContent = "✅ Link copiado para a área de transferência!";
+        })
+        .catch(err => {
+          console.error(err);
+          message.textContent = "❌ Erro ao copiar o link.";
+        });
+    });
+  </script>
+</body>
+</html>
