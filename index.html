@@ -70,8 +70,8 @@
     @media (max-width: 400px) {
       .container {
         padding: 20px;
-        width: 95%;       /* ocupa quase toda a tela */
-        max-width: 95%;   /* limite acompanha */
+        width: 95%;
+        max-width: 95%;
       }
       h2 {
         font-size: 1.2em;
@@ -103,7 +103,7 @@
     const fileInput = document.getElementById('fileInput');
     const copyBtn = document.getElementById('copyBtn');
     const message = document.getElementById('message');
-    let fileLink = ""; // Guarda o link do arquivo
+    let fileLink = "";
 
     uploadBtn.addEventListener('click', () => {
       if (!fileInput.files[0]) {
@@ -117,13 +117,14 @@
       message.textContent = "⏳ Enviando arquivo...";
       uploadBtn.disabled = true;
 
-      fetch('upload.php', {
+      // 👉 Corrigido para usar o backend do InfinityFree
+      fetch('https://mylinkdownloadtropa.gt.tc/upload.php', {
         method: 'POST',
         body: formData
       })
       .then(response => response.text())
       .then(data => {
-        fileLink = data.trim(); // salva o link do arquivo
+        fileLink = data.trim();
         copyBtn.disabled = false;
         message.textContent = "✅ Upload concluído! Clique no botão para copiar o link.";
       })
